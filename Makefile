@@ -13,6 +13,6 @@ GypAndroid.mk: libhelloworld.gyp ./deps/djinni/support-lib/support_lib.gyp hello
 	ANDROID_BUILD_TOP=$(shell dirname `which ndk-build`) deps/gyp/gyp --depth=. -f android -DOS=android -Ideps/djinni/common.gypi ./libhelloworld.gyp --root-target=libhelloworld_jni
 # this target implicitly depends on GypAndroid.mk since gradle will try to make it
 android: GypAndroid.mk
-cd android_project/HelloWorld/ && ./gradlew app:assembleDebug
+cd android/ && ./gradlew app:assembleDebug
 	@echo "Apks produced at:"
 	@python deps/djinni/example/glob.py ./ '*.apk'
