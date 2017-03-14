@@ -1,5 +1,6 @@
 # Djinnius
 #
+build_ios/
 deps/
 generated-src/
 

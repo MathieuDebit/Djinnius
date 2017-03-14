@@ -4,12 +4,37 @@
 
 import React, { Component } from 'react';
 import {
+  NativeModules,
   StyleSheet,
   Text,
   View
 } from 'react-native';
 
+var HelloWorld = NativeModules.HelloWorld;
+
 export default class Djinnius extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      init: null,
+    }
+  }
+
+  componentDidMount() {
+    this.init();
+  }
+
+  async init() {
+    try {
+      let init = await HelloWorld.init();
+
+      this.setState({ init });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -22,6 +47,13 @@ export default class Djinnius extends Component {
         <Text style={styles.content}>
            iOS & Android
         </Text>
+
+        {
+          this.state.init &&
+          <Text style={styles.content}>
+             {this.state.init}
+          </Text>
+        }
       </View>
     );
   }
