@@ -6,8 +6,9 @@
 
 ```
 git clone --recursive git@github.com:MathieuDebit/Djinnius.git
-cd Djinnius
+cd Djinnius/deps/gyp && git checkout -q 0bb67471bca068996e15b56738fa4824dfa19de0 && cd ../..
 npm install
+sh ./run_djinni.sh
 
 react-native run-ios
 react-native run-android
