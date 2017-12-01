@@ -1,3 +1,7 @@
+plugins {
+    id 'com.github.jlouns.cpe' version '0.1.0'
+}
+
 apply plugin: "com.android.application"
 
 import com.android.build.OutputFile
@@ -82,6 +86,9 @@ def enableSeparateBuildPerCPUArchitecture = false
  */
 def enableProguardInReleaseBuilds = false
 
+//import org.apache.tools.ant.taskdefs.condition.Os
+
+apply plugin: 'android'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
@@ -94,6 +101,7 @@ android {
         versionName "1.0"
         ndk {
             abiFilters "armeabi-v7a", "x86"
+            moduleName "HelloWord"
         }
     }
     splits {
@@ -123,6 +131,32 @@ android {
             }
         }
     }
+
+    sourceSets.main {
+        jniLibs.srcDirs = ['libs']
+    }
+}
+
+task ndkBuild(type: CrossPlatformExec) {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    def ndkDir = properties.getProperty('ndk.dir')
+
+    if (ndkDir == null) {
+        def gradle_project_root = project.rootProject.rootDir
+        throw new GradleException("NDK is not configured. Make sure there is a local.properties " +
+                "file with an ndk.dir entry in the directory ${gradle_project_root}, or set the " +
+                "ANDROID_NDK envrionment variable")
+    }
+
+    def ndkBuildExecutable = new File(ndkDir, 'ndk-build')
+    if (!ndkBuildExecutable.exists()) {
+        throw new GradleException("Could not find ndk-build. The configured NDK directory ${ndkDir} may not be correct.")
+    }
+    
+    environment("NDK_PROJECT_PATH",".")
+    environment("GYP_CONFIGURATION", "Debug")
+    commandLine(ndkBuildExecutable, "-j8")
 }
 
 dependencies {
@@ -136,4 +170,8 @@ dependencies {
 task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
+}
+
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn ndkBuild
 }
