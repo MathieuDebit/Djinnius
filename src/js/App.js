@@ -7,7 +7,8 @@ import {
   NativeModules,
   StyleSheet,
   Text,
-  View
+  View,
+  Platform
 } from 'react-native';
 
 var HelloWorld = NativeModules.HelloWorld;
@@ -27,9 +28,16 @@ export default class Djinnius extends Component {
 
   async init() {
     try {
-      let init = await HelloWorld.init();
 
-      this.setState({ init });
+      if(Platform.OS === 'ios'){
+        let init = await HelloWorld.init();
+        this.setState({ init });
+      }
+      else if(Platform.OS === 'android'){
+        await HelloWorld.init(
+          (error) => { console.log(error) },
+          (uri) => { this.setState({init:uri});});
+      }
     } catch (e) {
       console.error(e);
     }
